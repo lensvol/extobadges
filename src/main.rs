@@ -178,12 +178,17 @@ fn main() {
     for badge_name in badges_info.keys() {
         println!("Generating badge for '{badge_name}'...");
         let pages = badges_info.get(badge_name).unwrap();
-        let badge_svg = generate_users_badge(&pages, config.delay).expect("Ook");
+        let badge_svg = generate_users_badge(&pages, config.delay);
+
+        if badge_svg.is_err() {
+            println!("Failed to generate badge for '{badge_name}'!");
+            continue;
+        }
 
         // TODO: Use proper path buffers
         let mut file = File::create(format!("{}/{}.svg", config.dest_path, badge_name))
             .expect("Failed to create SVG file");
-        file.write_all(badge_svg.as_ref()).expect("Failed to write SVG contents into file");
+        file.write_all(badge_svg.unwrap().as_ref()).expect("Failed to write SVG contents into file");
     }
 
 }
